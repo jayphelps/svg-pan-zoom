@@ -349,8 +349,14 @@ ShadowViewport.prototype.getCTM = function() {
   safeCTM.b = 0
   safeCTM.c = 0
   safeCTM.d = this.activeState.zoom
-  safeCTM.e = this.activeState.x
-  safeCTM.f = this.activeState.y
+
+  if (this.options.subpixel) {
+    safeCTM.e = this.activeState.x
+    safeCTM.f = this.activeState.y
+  } else {
+    safeCTM.e = Math.round(this.activeState.x)
+    safeCTM.f = Math.round(this.activeState.y)
+  }
 
   return safeCTM
 }
@@ -505,6 +511,7 @@ var optionsDefaults = {
 , contain: false // enable or disable viewport contain the svg (default false)
 , center: true // enable or disable viewport centering in SVG (default true)
 , refreshRate: 'auto' // Maximum number of frames per second (altering SVG's viewport)
+, subpixel: true // generate pan x/y coordinates with exact subpixel dimensions, or round to nearest pixel (default true)
 , beforeZoom: null
 , onZoom: null
 , beforePan: null
@@ -542,6 +549,7 @@ SvgPanZoom.prototype.init = function(svg, options) {
   , contain: this.options.contain
   , center: this.options.center
   , refreshRate: this.options.refreshRate
+  , subpixel: this.options.subpixel
   // Put callbacks into functions as they can change through time
   , beforeZoom: function(oldScale, newScale) {
       if (that.viewport && that.options.beforeZoom) {return that.options.beforeZoom(oldScale, newScale)}
